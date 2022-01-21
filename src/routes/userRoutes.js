@@ -10,9 +10,9 @@ const {
   // transferring,
 } = require("../controllers/userControllers");
 
-router.get("/users/:id", getUser);
-router.get("/users", getAllUsers);
-router.post("/users", addUser);
+router.get("api/users/:id", getUser);
+router.get("api/users", getAllUsers);
+router.post("api/users", addUser);
 // router.patch("/users/:id", creditUpdate);
 // router.patch("/users/:id", withdrawMoney);
 // router.patch("/users/:id", depositing);
