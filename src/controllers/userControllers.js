@@ -29,7 +29,7 @@ const addUser = async (req, res) => {
   const newUser = await new Users(req.body);
   try {
     await newUser.save();
-    res.status(201).send(product);
+    res.status(201).send(newUser);
   } catch (error) {
     res.status(400).send(error);
   }
