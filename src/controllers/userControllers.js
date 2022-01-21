@@ -26,7 +26,7 @@ const getAllUsers = async (req, res) => {
 
 // Adding a new user
 const addUser = async (req, res) => {
-  const newUser = await new Users(req.body);
+  const newUser = new Users(req.body);
   try {
     await newUser.save();
     res.status(201).send(newUser);
