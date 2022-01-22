@@ -4,18 +4,18 @@ const {
   getUser,
   getAllUsers,
   addUser,
-  // creditUpdate,
-  // withdrawMoney,
-  // depositing,
-  // transferring,
+  depositing,
+  creditUpdate,
+  withdrawMoney,
+  transferring,
 } = require("../controllers/userControllers");
 
-router.get("/users/:id", getUser);
 router.get("/users", getAllUsers);
 router.post("/users", addUser);
-// router.patch("/users/:id", creditUpdate);
-// router.patch("/users/:id", withdrawMoney);
-// router.patch("/users/:id", depositing);
-// router.patch("/users/:id", transferring);
+router.put("/users/depositing", depositing);
+router.put("/users/creditupdate", creditUpdate);
+router.put("/users/withdrawmoney", withdrawMoney);
+router.put("/users/transferring", transferring);
+router.get("/users/:id", getUser);
 
 module.exports = router;

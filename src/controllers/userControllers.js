@@ -27,7 +27,6 @@ const getAllUsers = async (req, res) => {
 // Adding a new user
 const addUser = async (req, res) => {
   const newUser = await new userModel(req.body);
-  console.log(req.body);
   try {
     await newUser.save();
     res.status(201).send(newUser);
@@ -36,121 +35,125 @@ const addUser = async (req, res) => {
   }
 };
 
-// // Depositing
-// const depositing = async (req, res) => {
-//   const userIndex = usersData.findIndex((user) => {
-//     return user.passportID === id;
-//   });
-//   if (userIndex !== -1) {
-//     usersData[userIndex].cash = cash;
-//     saveUsers(usersData);
-//     return usersData[userIndex];
-//   } else {
-//     throw Error("cannot find user");
-//   }
-// };
+// Depositing
+const depositing = async (req, res) => {
+  const { id, amount } = req.body;
+  try {
+    const updatedUser = await userModel.findById(id);
+    updatedUser.cash += amount;
+    const user = await userModel.findByIdAndUpdate(id, updatedUser, {
+      new: true,
+    });
+    if (!user) {
+      return res.status(404).send(`user id ${id} cannot be found`);
+    }
+    res.status(200).send(user);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
 
-// //Update credit
-// const creditUpdate = (id, money) => {
-//   if (money <= 0) {
-//     throw Error("positive money only");
-//   } else {
-//     const usersData = loadUsers();
-//     const userIndex = usersData.findIndex((user) => {
-//       return user.passportID === id;
-//     });
-//     const isActive = usersData[userIndex].isActive;
-//     if (userIndex !== -1) {
-//       if (!isActive) {
-//         throw Error("user is not active");
-//       } else {
-//         usersData[userIndex].credit = usersData[userIndex].credit + money;
-//         saveUsers(usersData);
-//         return usersData[userIndex];
-//       }
-//     } else {
-//       throw Error("cannot find user");
-//     }
-//   }
-// };
+//Update credit
+const creditUpdate = async (req, res) => {
+  const { id, amount } = req.body;
+  try {
+    if (amount <= 0) {
+      throw Error("positive money only");
+    } else {
+      const updatedUser = await userModel.findById(id);
+      updatedUser.credit += amount;
+      const user = await userModel.findByIdAndUpdate(id, updatedUser, {
+        new: true,
+      });
+      if (!user) {
+        return res.status(404).send(`user id ${id} cannot be found`);
+      }
+      res.status(200).send(user);
+    }
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
 
-// // Withdraw money
-// const withdrawMoney = (id, money) => {
-//   if (money < 0) {
-//     throw Error("positive money only");
-//   } else {
-//     const usersData = loadUsers();
-//     const userIndex = usersData.findIndex((user) => {
-//       return user.passportID === id;
-//     });
-//     const isActive = usersData[userIndex].isActive;
-//     if (userIndex !== -1) {
-//       if (!isActive) {
-//         throw Error("user is not active");
-//       } else {
-//         if (money > userCash + userCredit) {
-//           throw Error("cannot withdraw that amount. try a lower amount");
-//         } else if (userCash >= money) {
-//           usersData[userIndex].cash -= money;
-//           saveUsers(usersData);
-//           return usersData[userIndex];
-//         } else {
-//           money -= usersData[userIndex].cash;
-//           usersData[userIndex].cash = 0;
-//           usersData[userIndex].credit -= money;
-//           saveUsers(usersData);
-//           return usersData[userIndex];
-//         }
-//       }
-//     } else {
-//       throw Error("cannot find user");
-//     }
-//   }
-// };
+// Withdraw money
+const withdrawMoney = async (req, res) => {
+  const { id, amount } = req.body;
+  try {
+    if (amount < 0) {
+      return res.status(400).send("positive amount only");
+    }
+    const updatedUser = await userModel.findById(id);
+    if (!updatedUser) {
+      return res.status(404).send(`user id ${id} cannot be found`);
+    }
+    if (amount > updatedUser.cash + updatedUser.credit) {
+      return res
+        .status(400)
+        .send("cannot withdraw that amount. try a lower amount");
+    }
+    if (updatedUser.cash >= amount) {
+      updatedUser.cash -= amount;
+      const user = await userModel.findByIdAndUpdate(id, updatedUser, {
+        new: true,
+      });
+      res.status(200).send(user);
+    } else {
+      amount -= updatedUser.cash;
+      updatedUser.cash = 0;
+      updatedUser.credit -= amount;
+      const user = await userModel.findByIdAndUpdate(id, updatedUser, {
+        new: true,
+      });
+      res.status(200).send(user);
+    }
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
 
-// // transferring
-// const transferring = (transferringID, recievingID, money) => {
-//   if (money < 0) {
-//     throw Error("positive money only");
-//   } else {
-//     const usersData = loadUsers();
-//     const transferringUserIdx = usersData.findIndex((user) => {
-//       return user.passportID === transferringID;
-//     });
-//     const recievingUserIdx = usersData.findIndex((user) => {
-//       return user.passportID === recievingID;
-//     });
-//     let userCash = usersData[transferringUserIdx].cash;
-//     let userCredit = usersData[transferringUserIdx].credit;
-
-//     if (transferringUserIdx !== -1 && recievingUserIdx !== -1) {
-//       if (money > userCash + userCredit) {
-//         throw Error("cannot transfer that amount. try a lower amount");
-//       } else if (userCash >= money) {
-//         userCash -= money;
-//         usersData[recievingUserIdx].cash += money;
-//         saveUsers(usersData);
-//         return [usersData[transferringUserIdx], usersData[recievingUserIdx]];
-//       } else {
-//         usersData[recievingUserIdx].cash += money;
-//         money -= usersData[transferringUserIdx].cash;
-//         usersData[transferringUserIdx].cash = 0;
-//         usersData[transferringUserIdx].credit -= money;
-//         saveUsers(usersData);
-//         return [usersData[transferringUserIdx], usersData[recievingUserIdx]];
-//       }
-//     } else {
-//       throw Error("one or two users dont exist");
-//     }
-//   }
-// };
+// transferring
+const transferring = async (req, res) => {
+  const { transferringID, recievingID, amount } = req.body;
+  try {
+    if (amount < 0) {
+      return res.status(400).send("positive amount only");
+    }
+    const tuser = await userModel.findById(transferringID);
+    const ruser = await userModel.findById(recievingID);
+    if (!tuser || !ruser) {
+      return res.status(404).send("one or two users dont exist");
+    }
+    if (amount > tuser.cash + tuser.credit) {
+      return res
+        .status(400)
+        .send("cannot transfer that amount. try a lower amount");
+    }
+    if (tuser.cash >= amount) {
+      tuser.cash -= amount;
+      ruser.cash += amount;
+      await tuser.save();
+      await ruser.save();
+      res.status(200).send(`${amount} was transffered to ${ruser}`);
+    } else {
+      ruser.cash += amount;
+      amount -= tuser.cash;
+      tuser.cash = 0;
+      tuser.credit -= amount;
+      await tuser.save();
+      await ruser.save();
+      res.status(200).send(`${amount} was transffered to ${ruser}`);
+    }
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
 
 module.exports = {
   getUser,
   getAllUsers,
   addUser,
-  // creditUpdate,
-  // withdrawMoney,
-  // depositing,
-  // transferring,
+  depositing,
+  creditUpdate,
+  withdrawMoney,
+  transferring,
 };
