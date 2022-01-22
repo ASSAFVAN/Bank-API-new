@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
-const Users = mongoose.model("User", {
+const User = mongoose.model("User", {
   id: {
     type: String,
-    required: false,
+    required: true,
     unique: true,
   },
   cash: {
@@ -12,7 +12,6 @@ const Users = mongoose.model("User", {
     default: 0,
     min: 0,
   },
-
   credit: {
     type: Number,
     required: true,
@@ -21,4 +20,4 @@ const Users = mongoose.model("User", {
   },
 });
 // module.exports = { Users };
-module.exports = { Users };
+module.exports = User;

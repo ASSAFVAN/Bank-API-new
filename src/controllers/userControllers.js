@@ -1,10 +1,10 @@
-const { Users } = require("../model/user");
+const userModel = require("../model/user");
 
 // Show details of specific user
 const getUser = async (req, res) => {
   const userID = req.params.id;
   try {
-    const matchedUser = await Users.findById(userID);
+    const matchedUser = await userModel.findById(userID);
     if (!matchedUser) {
       return res.status(404).send(`user id ${id} cannot be found`);
     }
@@ -17,7 +17,7 @@ const getUser = async (req, res) => {
 // Get all users
 const getAllUsers = async (req, res) => {
   try {
-    const users = await Users.find();
+    const users = await userModel.find();
     res.status(200).send(users);
   } catch (error) {
     res.status(500).send(error);
@@ -26,7 +26,7 @@ const getAllUsers = async (req, res) => {
 
 // Adding a new user
 const addUser = async (req, res) => {
-  const newUser = new Users(req.body);
+  const newUser = await new userModel(req.body);
   try {
     await newUser.save();
     res.status(201).send(newUser);
