@@ -1,6 +1,6 @@
 import "./App.css";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import Homepage from "./components/HomePage/HomePage";
+import Homepage from "./components/Homepage/Homepage";
 import Header from "./components/Header/Header";
 import Users from "./components/Users/Users";
 import Actions from "./components/Actions/Actions";
@@ -21,3 +21,4 @@ function App() {
     </div>
   );
 }
+export default App;
