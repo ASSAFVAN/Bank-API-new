@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const Users = mongoose.model("User", {
   id: {
     type: String,
-    required: true,
+    required: false,
     unique: true,
   },
   cash: {
@@ -20,4 +20,5 @@ const Users = mongoose.model("User", {
     min: 0,
   },
 });
+// module.exports = { Users };
 module.exports = { Users };
